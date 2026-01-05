@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora Saldo a Favor</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    .box {
+      background: #ffffff;
+      padding: 20px;
+      max-width: 520px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      margin-top: 0;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 12px;
+    }
+    select, input, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+    }
+    button {
+      margin-top: 14px;
+      cursor: pointer;
+    }
+    .resultado {
+      margin-top: 16px;
+      padding: 12px;
+      background: #eef6ff;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h2>Calculadora de Saldo a Favor</h2>
+
+    <label>Carrera</label>
+    <select id="carrera"></select>
+
+    <label>Monto abonado</label>
+    <input type="number" id="monto" placeholder="Ej: 204000">
+
+    <label>Cursos para saldo a favor</label>
+    <select class="curso"></select>
+    <select class="curso"></select>
+    <select class="curso"></select>
+    <select class="curso"></select>
+
+    <button onclick="calcular()">Calcular</button>
+
+    <div class="resultado" id="resultado"></div>
+
+    <button onclick="copiar()">Copiar texto</button>
+  </div>
+
+<script>
+let data = [];
+
+// Carga del CSV
+fetch("data.csv")
+  .then(r => r.text())
+  .then(text => {
+    const rows = text.split("\n").slice(1);
+    rows.forEach(r => {
+      if (!r.trim()) return;
+      const [carrera, curso, porcentaje] = r.split(",");
+      data.push({
+        carrera: carrera.trim(),
+        curso: curso.trim(),
+        porcentaje: Number(porcentaje)
+      });
+    });
+    cargarCarreras();
+  });
+
+// Cargar carreras
+function cargarCarreras() {
+  const select = document.getElementById("carrera");
+  const carreras = [...new Set(data.map(d => d.carrera))];
+
+  select.innerHTML = "";
+  carreras.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    select.appendChild(opt);
+  });
+
+  select.onchange = cargarCursos;
+  cargarCursos();
+}
+
+// Cargar cursos según carrera
+function cargarCursos() {
+  const carrera = document.getElementById("carrera").value;
+  const cursos = data.filter(d => d.carrera === carrera);
+
+  document.querySelectorAll(".curso").forEach(select => {
+    select.innerHTML = "<option value=''>-- seleccionar --</option>";
+    cursos.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.curso;
+      opt.textContent = c.curso;
+      select.appendChild(opt);
+    });
+  });
+}
+
+// Calcular saldo a favor
+function calcular() {
+  const monto = Number(document.getElementById("monto").value);
+  if (!monto) {
+    document.getElementById("resultado").innerText =
+      "Ingresá el monto abonado.";
+    return;
+  }
+
+  let total = 0;
+  let cursosElegidos = [];
+
+  document.querySelectorAll(".curso").forEach(select => {
+    if (select.value) {
+      const cursoData = data.find(
+        d => d.carrera === document.getElementById("carrera").value &&
+             d.curso === select.value
+      );
+      if (cursoData) {
+        total += monto * (cursoData.porcentaje / 100);
+        cursosElegidos.push(select.value);
+      }
+    }
+  });
+
+  if (cursosElegidos.length === 0) {
+    document.getElementById("resultado").innerText =
+      "Seleccioná al menos un curso.";
+    return;
+  }
+
+  const texto =
+    `Se deja un saldo a favor de $${Math.round(total).toLocaleString("es-AR")} ` +
+    `correspondiente a los cursos ${cursosElegidos.join(", ")}.`;
+
+  document.getElementById("resultado").innerText = texto;
+}
+
+// Copiar al portapapeles
+function copiar() {
+  const texto = document.getElementById("resultado").innerText;
+  if (!texto) return;
+  navigator.clipboard.writeText(texto);
+  alert("Texto copiado");
+}
+</script>
+</body>
+</html>
