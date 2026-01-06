@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             background: #F8F2E8;
             padding: 20px;
             line-height: 1.6;
@@ -225,7 +225,7 @@
 <body>
     <div class="container">
         <h1>Calculadora de Saldo a Favor</h1>
-        <p class="subtitle">Cálculo de saldo proporcional para cambio de carrera a cursos</p>
+        <p class="subtitle">Calculo de porcentaje proporcional de cursos en Carreras</p>
 
         <div class="error" id="error"></div>
         <div class="loading" id="loading">Cargando datos...</div>
@@ -244,7 +244,7 @@
             </div>
 
             <div class="section" id="cursosSection" style="display: none;">
-                <label>Cursos a los que cambia (seleccionar uno o varios)</label>
+                <label>Cursos que quiere dejar con SAF (seleccionar uno o varios)</label>
                 <div class="cursos-container" id="cursosContainer">
                     <div class="empty-state">Selecciona una carrera para ver sus cursos</div>
                 </div>
@@ -252,7 +252,7 @@
 
             <div class="resultado" id="resultado">
                 <div class="resultado-row">
-                    <span class="resultado-label">Monto abonado</span>
+                    <span class="resultado-label">Monto abonado por estudiante</span>
                     <span class="resultado-valor" id="montoAbonado">$0</span>
                 </div>
                 <div class="resultado-row">
@@ -264,10 +264,10 @@
                     <span class="resultado-valor grande" id="saldoFavor">$0</span>
                 </div>
                 <div class="resultado-row">
-                    <span class="resultado-label">Valor para Dash</span>
+                    <span class="resultado-label">Valor para Dash redondeado</span>
                     <span class="resultado-valor" id="valorDash" style="font-family: monospace; font-size: 20px;">0</span>
                 </div>
-                <button class="btn-copiar" id="btnCopiar">📋 Copiar Resultado</button>
+                <button class="btn-copiar" id="btnCopiar">📋 Copiar resultado</button>
             </div>
         </div>
     </div>
