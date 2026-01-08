@@ -244,7 +244,7 @@
             </div>
 
             <div class="section" id="cursosSection" style="display: none;">
-                <label>Cursos que quiere dejar con SAF (seleccionar uno o varios)</label>
+                <label>Cursos que NO va a hacer (seleccionar uno o varios)</label>
                 <div class="cursos-container" id="cursosContainer">
                     <div class="empty-state">Selecciona una carrera para ver sus cursos</div>
                 </div>
@@ -411,7 +411,7 @@
                 porcentajeTotal += parseFloat(cb.dataset.porcentaje);
             });
             
-            const saldoFavor = monto * (1 - porcentajeTotal / 100);
+            const saldoFavor = monto * (porcentajeTotal / 100);
             const valorDash = Math.round(saldoFavor);
             
             document.getElementById('montoAbonado').textContent = `${monto.toLocaleString('es-AR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
@@ -436,10 +436,10 @@
             const texto = `CÁLCULO DE SALDO A FAVOR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Carrera origen: ${carrera}
-Cursos destino: ${cursosSeleccionados}
+Cursos que NO hace: ${cursosSeleccionados}
 
 Monto abonado: ${monto}
-Porcentaje aplicado: ${porcentaje}
+Porcentaje de cursos NO realizados: ${porcentaje}
 SALDO A FAVOR: ${saldo}
 
 VALOR PARA DASH: ${valorDash}`;
