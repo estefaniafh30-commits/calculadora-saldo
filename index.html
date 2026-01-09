@@ -372,14 +372,20 @@
             const sugerenciasDiv = document.getElementById('sugerencias');
             let carreraSeleccionada = '';
             
+            // Mostrar todas al hacer click en campo vacío
+            inputCarrera.addEventListener('focus', (e) => {
+                if (e.target.value.length === 0) {
+                    mostrarSugerencias(todasCarreras);
+                }
+            });
+            
             // Mostrar sugerencias mientras tipea
             inputCarrera.addEventListener('input', (e) => {
                 const valor = e.target.value.toLowerCase();
                 carreraSeleccionada = '';
                 
                 if (valor.length === 0) {
-                    sugerenciasDiv.classList.remove('visible');
-                    sugerenciasDiv.innerHTML = '';
+                    mostrarSugerencias(todasCarreras);
                     document.getElementById('cursosSection').style.display = 'none';
                     document.getElementById('resultado').classList.remove('visible');
                     return;
@@ -394,8 +400,12 @@
                     return;
                 }
                 
+                mostrarSugerencias(coincidencias);
+            });
+            
+            function mostrarSugerencias(carreras) {
                 sugerenciasDiv.innerHTML = '';
-                coincidencias.forEach(carrera => {
+                carreras.forEach(carrera => {
                     const div = document.createElement('div');
                     div.className = 'sugerencia-item';
                     div.textContent = carrera;
@@ -407,9 +417,8 @@
                     });
                     sugerenciasDiv.appendChild(div);
                 });
-                
                 sugerenciasDiv.classList.add('visible');
-            });
+            }
             
             // Cerrar sugerencias al hacer click fuera
             document.addEventListener('click', (e) => {
