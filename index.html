@@ -41,6 +41,7 @@
 
         .section {
             margin-bottom: 28px;
+            position: relative;
         }
 
         label {
@@ -69,17 +70,39 @@
             border-color: #FF632B;
         }
 
-        .busqueda-input {
-            margin-bottom: 8px;
-        }
-
-        .select-busqueda {
+        .sugerencias-container {
+            position: absolute;
+            width: calc(100% - 64px);
+            max-width: 736px;
             max-height: 250px;
             overflow-y: auto;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        select option {
-            padding: 8px;
+        .sugerencias-container.visible {
+            display: block;
+        }
+
+        .sugerencia-item {
+            padding: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .sugerencia-item:last-child {
+            border-bottom: none;
+        }
+
+        .sugerencia-item:hover {
+            background: #FFF6F3;
+            color: #FF632B;
         }
 
         .cursos-container {
@@ -251,10 +274,8 @@
 
             <div class="section">
                 <label for="carrera">Carrera Origen</label>
-                <select id="carrera" class="select-busqueda">
-                    <option value="">Seleccionar carrera...</option>
-                </select>
-                <input type="text" id="carreraBusqueda" class="busqueda-input" placeholder="Escribir para buscar..." autocomplete="off">
+                <input type="text" id="carrera" placeholder="Escribir nombre de carrera..." autocomplete="off">
+                <div id="sugerencias" class="sugerencias-container"></div>
             </div>
 
             <div class="section" id="cursosSection" style="display: none;">
@@ -346,40 +367,60 @@
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             
-            const select = document.getElementById('carrera');
             const todasCarreras = Object.keys(carreras).sort();
+            const inputCarrera = document.getElementById('carrera');
+            const sugerenciasDiv = document.getElementById('sugerencias');
+            let carreraSeleccionada = '';
             
-            todasCarreras.forEach(nombreCarrera => {
-                const option = document.createElement('option');
-                option.value = nombreCarrera;
-                option.textContent = nombreCarrera;
-                select.appendChild(option);
-            });
-            
-            // Búsqueda con filtro
-            const busqueda = document.getElementById('carreraBusqueda');
-            busqueda.addEventListener('input', (e) => {
-                const filtro = e.target.value.toLowerCase();
-                select.innerHTML = '<option value="">Seleccionar carrera...</option>';
+            // Mostrar sugerencias mientras tipea
+            inputCarrera.addEventListener('input', (e) => {
+                const valor = e.target.value.toLowerCase();
+                carreraSeleccionada = '';
                 
-                const carrerasFiltradas = todasCarreras.filter(c => 
-                    c.toLowerCase().includes(filtro)
+                if (valor.length === 0) {
+                    sugerenciasDiv.classList.remove('visible');
+                    sugerenciasDiv.innerHTML = '';
+                    document.getElementById('cursosSection').style.display = 'none';
+                    document.getElementById('resultado').classList.remove('visible');
+                    return;
+                }
+                
+                const coincidencias = todasCarreras.filter(c => 
+                    c.toLowerCase().includes(valor)
                 );
                 
-                carrerasFiltradas.forEach(nombreCarrera => {
-                    const option = document.createElement('option');
-                    option.value = nombreCarrera;
-                    option.textContent = nombreCarrera;
-                    select.appendChild(option);
+                if (coincidencias.length === 0) {
+                    sugerenciasDiv.classList.remove('visible');
+                    return;
+                }
+                
+                sugerenciasDiv.innerHTML = '';
+                coincidencias.forEach(carrera => {
+                    const div = document.createElement('div');
+                    div.className = 'sugerencia-item';
+                    div.textContent = carrera;
+                    div.addEventListener('click', () => {
+                        inputCarrera.value = carrera;
+                        carreraSeleccionada = carrera;
+                        sugerenciasDiv.classList.remove('visible');
+                        cargarCursos();
+                    });
+                    sugerenciasDiv.appendChild(div);
                 });
                 
-                if (carrerasFiltradas.length === 1) {
-                    select.value = carrerasFiltradas[0];
-                    cargarCursos();
+                sugerenciasDiv.classList.add('visible');
+            });
+            
+            // Cerrar sugerencias al hacer click fuera
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.section')) {
+                    sugerenciasDiv.classList.remove('visible');
                 }
             });
             
-            select.addEventListener('change', cargarCursos);
+            // Modificar cargarCursos para usar la variable
+            window.carreraSeleccionada = carreraSeleccionada;
+            
             document.getElementById('monto').addEventListener('input', calcular);
             document.getElementById('btnCopiar').addEventListener('click', copiarResultado);
         }
